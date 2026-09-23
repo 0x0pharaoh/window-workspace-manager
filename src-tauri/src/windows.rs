@@ -207,15 +207,15 @@ mod platform {
             }
             match state {
                 "minimized" => {
-                    ShowWindow(hwnd, SW_MINIMIZE);
+                    let _ = ShowWindow(hwnd, SW_MINIMIZE);
                 }
                 "maximized" | "fullscreen" => {
                     // Best effort: true fullscreen (exclusive/borderless) needs
                     // app cooperation; maximize is the sane approximation.
-                    ShowWindow(hwnd, SW_MAXIMIZE);
+                    let _ = ShowWindow(hwnd, SW_MAXIMIZE);
                 }
                 _ => {
-                    ShowWindow(hwnd, SW_RESTORE);
+                    let _ = ShowWindow(hwnd, SW_RESTORE);
                     SetWindowPos(
                         hwnd,
                         HWND_TOP,
@@ -243,7 +243,7 @@ mod platform {
                 return Err(WorksetError::Windows("window no longer exists".to_owned()));
             }
             if IsIconic(hwnd).as_bool() {
-                ShowWindow(hwnd, SW_RESTORE);
+                let _ = ShowWindow(hwnd, SW_RESTORE);
             }
             if !SetForegroundWindow(hwnd).as_bool() {
                 return Err(WorksetError::Windows(

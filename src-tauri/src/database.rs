@@ -157,6 +157,7 @@ impl Db {
     }
 
     /// In-memory database, used by unit tests.
+    #[cfg(test)]
     pub fn open_in_memory() -> Result<Self, WorksetError> {
         let conn = Connection::open_in_memory()?;
         Self::init_schema(&conn)?;

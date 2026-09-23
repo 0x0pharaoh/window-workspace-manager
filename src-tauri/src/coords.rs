@@ -60,6 +60,9 @@ pub fn clamp_normalized(nx: f64, ny: f64, nw: f64, nh: f64) -> (f64, f64, f64, f
 }
 
 /// Convert a normalized rect to native pixels inside a monitor work area.
+/// Takes eight scalars so call sites stay readable; the lint threshold is
+/// deliberately opted out for this coordinate tuple.
+#[allow(clippy::too_many_arguments)]
 pub fn normalized_to_native(
     nx: f64,
     ny: f64,

@@ -121,7 +121,7 @@ fn scan_running_processes() -> Vec<DiscoveredApp> {
     let sys = sysinfo::System::new_all();
     let mut found = Vec::new();
     for proc_ in sys.processes().values() {
-        let exe = proc_.exe().map(|p| os_to_string(p)).unwrap_or_default();
+        let exe = proc_.exe().map(os_to_string).unwrap_or_default();
         if exe.trim().is_empty() {
             continue;
         }

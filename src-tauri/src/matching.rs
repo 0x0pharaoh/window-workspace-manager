@@ -35,6 +35,9 @@ fn non_empty(opt: &Option<String>) -> Option<String> {
 /// A non-empty `title_regex` is tried first (an invalid pattern falls back
 /// to substring matching); otherwise `title_contains` applies; with neither
 /// set every title matches.
+///
+/// Test helper (production scoring inlines the same logic with weights).
+#[cfg(test)]
 pub fn is_title_match(title: &str, rules: &MatchRules) -> bool {
     if let Some(rx) = non_empty(&rules.title_regex) {
         if let Ok(re) = regex::Regex::new(&rx) {

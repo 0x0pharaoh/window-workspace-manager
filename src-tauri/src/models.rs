@@ -114,7 +114,7 @@ pub fn join_args(args: &[String]) -> String {
 mod args_string {
     use serde::{Deserialize, Deserializer, Serializer};
 
-    pub fn serialize<S>(args: &Vec<String>, ser: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S>(args: &[String], ser: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -559,7 +559,7 @@ mod tests {
         // serialized back with frontend names
         let out = serde_json::to_value(&app).unwrap();
         assert_eq!(out["delay_ms"], 500);
-        assert_eq!(out["favorite"].is_null(), true); // unrelated struct key absent
+        assert!(out["favorite"].is_null()); // unrelated struct key absent
     }
 
     #[test]

@@ -79,6 +79,9 @@ fn notify(app: &AppHandle, title: &str, body: &str) {
     let _ = app.notification().builder().title(title).body(body).show();
 }
 
+/// Eight parameters mirror the launch pipeline stages; a context struct
+/// would only add indirection for this private helper.
+#[allow(clippy::too_many_arguments)]
 fn record(
     db: &Db,
     session_id: &str,
@@ -106,6 +109,9 @@ fn record(
 }
 
 /// Launch (or reuse) a single app and move its window into place.
+/// Eight parameters mirror the launch pipeline stages; grouped structs
+/// would only add indirection here.
+#[allow(clippy::too_many_arguments)]
 async fn launch_single_app(
     app: &AppHandle,
     db: &Db,
