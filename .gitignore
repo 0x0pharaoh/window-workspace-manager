@@ -1,0 +1,15 @@
+# node
+node_modules/
+dist/
+# tauri
+src-tauri/target/
+src-tauri/gen/
+# rust
+**/*.rs.bk
+# os/editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+# local tools (not part of the repo)
+tools/
