@@ -37,12 +37,12 @@
     "category": "Utility",
     "shortDescription": "Launch and arrange groups of Windows apps as reusable workspaces.",
     "longDescription": "Workset lets you save, launch and arrange groups of applications across multiple monitors.",
-    "nsis": {
-      "displayLanguageSelector": false
-    },
     "windows": {
       "certificateThumbprint": null,
-      "digestAlgorithm": "sha256"
+      "digestAlgorithm": "sha256",
+      "nsis": {
+        "displayLanguageSelector": false
+      }
     }
   }
 }
