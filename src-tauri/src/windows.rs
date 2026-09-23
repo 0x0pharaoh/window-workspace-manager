@@ -15,10 +15,10 @@ mod platform {
         GetCurrentProcessId, OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ,
     };
     use windows::Win32::UI::WindowsAndMessaging::{
-        EnumWindows, GetClassNameW, GetForegroundWindow, GetWindowRect, GetWindowTextW,
-        GetWindowThreadProcessId, IsIconic, IsWindow, IsWindowVisible, IsZoomed, PostMessageW,
-        SetForegroundWindow, SetWindowPos, ShowWindow, HWND_TOP, SWP_NOACTIVATE, SWP_NOZORDER,
-        SWP_SHOWWINDOW, SW_MAXIMIZE, SW_MINIMIZE, SW_RESTORE, WM_CLOSE,
+        EnumWindows, GetClassNameW, GetWindowRect, GetWindowTextW, GetWindowThreadProcessId,
+        IsIconic, IsWindow, IsWindowVisible, IsZoomed, PostMessageW, SetForegroundWindow,
+        SetWindowPos, ShowWindow, HWND_TOP, SWP_NOACTIVATE, SWP_NOZORDER, SWP_SHOWWINDOW,
+        SW_MAXIMIZE, SW_MINIMIZE, SW_RESTORE, WM_CLOSE,
     };
 
     use crate::error::WorksetError;
@@ -236,15 +236,6 @@ mod platform {
         unsafe { IsWindow(HWND(hwnd as *mut core::ffi::c_void)).as_bool() }
     }
 
-    pub fn get_foreground() -> Option<i64> {
-        let hwnd = unsafe { GetForegroundWindow() };
-        if hwnd.0.is_null() {
-            None
-        } else {
-            Some(hwnd.0 as i64)
-        }
-    }
-
     pub fn focus_window(hwnd: i64) -> Result<(), WorksetError> {
         let hwnd = HWND(hwnd as *mut core::ffi::c_void);
         unsafe {
@@ -311,10 +302,6 @@ mod platform {
         false
     }
 
-    pub fn get_foreground() -> Option<i64> {
-        None
-    }
-
     pub fn focus_window(_hwnd: i64) -> Result<(), WorksetError> {
         Err(WorksetError::Windows(OFF.to_owned()))
     }
@@ -325,6 +312,6 @@ mod platform {
 }
 
 pub use platform::{
-    close_window, enum_windows, find_window, focus_window, get_foreground, is_window_valid,
-    move_window, snapshot_before_launch,
+    close_window, enum_windows, find_window, focus_window, is_window_valid, move_window,
+    snapshot_before_launch,
 };
