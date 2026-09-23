@@ -17,14 +17,6 @@ pub struct NativeRect {
 }
 
 impl NativeRect {
-    pub fn area(&self) -> i64 {
-        if self.w <= 0 || self.h <= 0 {
-            0
-        } else {
-            self.w as i64 * self.h as i64
-        }
-    }
-
     /// Overlap area with another rect (0 when disjoint or empty).
     /// Uses i64 math so negative origins cannot overflow.
     pub fn overlap(&self, other: &NativeRect) -> i64 {
@@ -93,24 +85,6 @@ pub fn normalized_to_native(
         w: (w * work_w as f64).round() as i32,
         h: (h * work_h as f64).round() as i32,
     }
-}
-
-/// Convert a native rect back to normalized coordinates of a work area.
-pub fn native_to_normalized(
-    rect: NativeRect,
-    work_x: i32,
-    work_y: i32,
-    work_w: i32,
-    work_h: i32,
-) -> (f64, f64, f64, f64) {
-    if work_w <= 0 || work_h <= 0 {
-        return (0.0, 0.0, 0.5, 0.5);
-    }
-    let nx = (rect.x - work_x) as f64 / work_w as f64;
-    let ny = (rect.y - work_y) as f64 / work_h as f64;
-    let nw = rect.w as f64 / work_w as f64;
-    let nh = rect.h as f64 / work_h as f64;
-    clamp_normalized(nx, ny, nw, nh)
 }
 
 pub fn monitor_full_rect(m: &MonitorInfo) -> NativeRect {
@@ -201,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    fn roundtrip_center() {
+    fn forward_center() {
         let r = normalized_to_native(0.25, 0.25, 0.5, 0.5, 0, 0, 1920, 1080);
         assert_eq!(
             r,
@@ -212,11 +186,6 @@ mod tests {
                 h: 540
             }
         );
-        let (nx, ny, nw, nh) = native_to_normalized(r, 0, 0, 1920, 1080);
-        assert!((nx - 0.25).abs() < 1e-9);
-        assert!((ny - 0.25).abs() < 1e-9);
-        assert!((nw - 0.5).abs() < 1e-9);
-        assert!((nh - 0.5).abs() < 1e-9);
     }
 
     #[test]
@@ -255,7 +224,6 @@ mod tests {
     fn zero_size_guards() {
         let r = normalized_to_native(0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0);
         assert_eq!(r.w, 0);
-        assert_eq!(native_to_normalized(r, 0, 0, 0, 0), (0.0, 0.0, 0.5, 0.5));
         assert!(!is_rect_visible_on_any_monitor(&[], r));
         assert_eq!(pick_monitor_for_rect(&[], r), "");
     }

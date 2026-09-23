@@ -4,6 +4,7 @@ import {
   clampRect,
   isOffscreen,
   isValidRect,
+  nativeToNormalized,
   normalizedToPreview,
   previewToNormalized,
   rectsOverlap,
@@ -38,6 +39,20 @@ describe("coords", () => {
       expect(back.w).toBeCloseTo(r.w, 5);
       expect(back.h).toBeCloseTo(r.h, 5);
     }
+  });
+
+  it("converts native pixels to normalized work-area coords", () => {
+    const r = nativeToNormalized(480, 270, 960, 540, 0, 0, 1920, 1080);
+    expect(r.x).toBeCloseTo(0.25, 5);
+    expect(r.y).toBeCloseTo(0.25, 5);
+    expect(r.w).toBeCloseTo(0.5, 5);
+    expect(r.h).toBeCloseTo(0.5, 5);
+    // negative monitor origin
+    const left = nativeToNormalized(-1440, 100, 480, 400, -1920, 0, 1920, 1080);
+    expect(left.x).toBeCloseTo(0.25, 5);
+    expect(isValidRect(left)).toBe(true);
+    // degenerate work area falls back to a sane default
+    expect(nativeToNormalized(0, 0, 10, 10, 0, 0, 0, 0)).toEqual({ x: 0.05, y: 0.05, w: 0.6, h: 0.6 });
   });
 
   it("detects overlap and offscreen", () => {

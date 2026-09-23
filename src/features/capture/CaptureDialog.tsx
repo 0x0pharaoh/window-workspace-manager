@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import type { CapturedWindow } from "@/types";
 import { useWorkspaces } from "@/stores/useWorkspaces";
-import { enumWindows } from "@/services/tauri";
+import { useMonitors } from "@/stores/useMonitors";
+import { captureDesktop } from "@/services/tauri";
+import { nativeToNormalized } from "@/lib/coords";
 import { Badge, Button, Card, Dialog, Input, Select } from "@/components/ui";
 
 interface EditableRow extends CapturedWindow {
@@ -19,6 +21,8 @@ export function CaptureDialog({
   onSaved?: () => void;
 }) {
   const { workspaces, createWorkspace, createApp } = useWorkspaces();
+  const monitors = useMonitors((s) => s.monitors);
+  const fetchMonitors = useMonitors((s) => s.fetchMonitors);
   const [rows, setRows] = useState<EditableRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -28,7 +32,8 @@ export function CaptureDialog({
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    enumWindows()
+    void fetchMonitors();
+    captureDesktop()
       .then((wins) => {
         const filtered = wins.filter((w) => (w.title || "").trim() !== "");
         setRows(
@@ -62,6 +67,13 @@ export function CaptureDialog({
         wsId = ws.id;
       }
       for (const [i, w] of chosen.entries()) {
+        // Preserve the window's actual position: convert its native pixels
+        // to normalized work-area coords (falls back to a default tile).
+        const m = monitors.find((mm) => mm.id === w.monitor_id);
+        const r =
+          m && m.work_width > 0 && m.work_height > 0
+            ? nativeToNormalized(w.x, w.y, w.width, w.height, m.work_x, m.work_y, m.work_width, m.work_height)
+            : { x: 0.05, y: 0.05, w: 0.6, h: 0.6 };
         await createApp(wsId, {
           name: w.customName.trim() || w.title || "Captured app",
           exe_path: w.exe_path,
@@ -70,10 +82,10 @@ export function CaptureDialog({
           url: "",
           delay_ms: i * 500,
           monitor_id: w.monitor_id,
-          x: 0.05,
-          y: 0.05,
-          w: 0.6,
-          h: 0.6,
+          x: r.x,
+          y: r.y,
+          w: r.w,
+          h: r.h,
           state: w.state ?? "normal",
           policy: "if_not_running",
           match_rules: {

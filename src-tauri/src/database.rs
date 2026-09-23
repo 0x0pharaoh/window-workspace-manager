@@ -746,25 +746,6 @@ impl Db {
         )?;
         Ok(())
     }
-
-    pub fn list_catalog(&self) -> Result<Vec<crate::models::DiscoveredApp>, WorksetError> {
-        let conn = self.lock()?;
-        let mut stmt = conn.prepare(
-            "SELECT exe_path, name, icon, source FROM app_catalog
-             ORDER BY last_seen DESC LIMIT 2000",
-        )?;
-        let rows = stmt
-            .query_map([], |r| {
-                Ok(crate::models::DiscoveredApp {
-                    exe_path: r.get(0)?,
-                    name: r.get(1)?,
-                    icon: r.get(2)?,
-                    source: r.get(3)?,
-                })
-            })?
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(rows)
-    }
 }
 
 #[cfg(test)]
@@ -882,13 +863,14 @@ mod tests {
         db.set_setting("theme", "dark").unwrap();
         assert_eq!(db.get_setting("theme").unwrap().as_deref(), Some("dark"));
 
-        db.upsert_catalog(&DiscoveredApp {
+        // catalog upsert is idempotent (repeat insert overwrites, never errors)
+        let entry = crate::models::DiscoveredApp {
             name: "X".to_owned(),
             exe_path: "C:\\x.exe".to_owned(),
             source: "installed".to_owned(),
             icon: String::new(),
-        })
-        .unwrap();
-        assert_eq!(db.list_catalog().unwrap().len(), 1);
+        };
+        db.upsert_catalog(&entry).unwrap();
+        db.upsert_catalog(&entry).unwrap();
     }
 }

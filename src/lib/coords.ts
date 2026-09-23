@@ -59,6 +59,25 @@ export function previewToNormalized(p: PxRect, previewW: number, previewH: numbe
   });
 }
 
+export function nativeToNormalized(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  workX: number,
+  workY: number,
+  workW: number,
+  workH: number,
+): NormRect {
+  if (!(workW > 0) || !(workH > 0)) return { x: 0.05, y: 0.05, w: 0.6, h: 0.6 };
+  return clampRect({
+    x: (x - workX) / workW,
+    y: (y - workY) / workH,
+    w: w / workW,
+    h: h / workH,
+  });
+}
+
 export function rectsOverlap(a: NormRect, b: NormRect): boolean {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }

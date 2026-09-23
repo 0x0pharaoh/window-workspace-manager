@@ -283,15 +283,6 @@ pub struct DiscoveredApp {
     pub icon: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LaunchProgress {
-    pub session_id: String,
-    pub app_id: String,
-    pub status: String,
-    #[serde(default)]
-    pub message: String,
-}
-
 /// Progress event emitted on the `launch-progress` channel. Carries the
 /// spec fields plus the frontend's display fields.
 #[derive(Debug, Clone, Serialize, Deserialize)]
